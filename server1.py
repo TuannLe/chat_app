@@ -7,7 +7,7 @@ import mysql.connector
 # Socket
 HOST = "127.0.0.1" 
 SERVER_PORT = 65432 
-FORMAT = "utf8"
+FORMAT = "utf-8"
 
 # Database config
 # SERVER = 'LAPTOP-4NB1E5PG\SQLEXPRESS'
@@ -36,17 +36,17 @@ def recvList(conn):
     return list
 
 def serverLogin(conn):
-    print('Login starting...')
     username= conn.recv(1024).decode(FORMAT)
-    conn.sendall(username.encode(FORMAT)) 
+    # conn.sendall(username.encode(FORMAT)) 
     pswd = conn.recv(1024).decode(FORMAT)
-    conn.sendall(pswd.encode(FORMAT))  
+    # conn.sendall(pswd.encode(FORMAT))  
+    print('USER',username, 'pass', pswd)
     hashpass = hashlib.md5(pswd.encode(FORMAT)).hexdigest()
     
     cursor.execute("SELECT * FROM account WHERE username='%s' AND password='%s'" % (username, hashpass))
     data = cursor.fetchall()
     msg='okk'
-    if(data):
+    if(data):   
         msg = SUCCESS
         print(msg)
     else:
@@ -60,7 +60,7 @@ def handleClient(conn: socket, addr):
     while (option != END):
         if (option == LOGIN):
             serverLogin(conn)     
-    
+
     print("client" , addr, "finished")
     print(conn.getsockname(), "closed")
     conn.close()
@@ -89,7 +89,7 @@ nClient = 0
 while (nClient < 5):
     try:
         conn, addr = s.accept()
-        
+        print(nClient)
         thr = threading.Thread(target=handleClient, args=(conn,addr))
         thr.daemon = False
         thr.start()
